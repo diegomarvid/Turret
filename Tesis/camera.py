@@ -3,7 +3,6 @@ import numpy as np
 import time
 from pathlib import Path
 from multiprocessing.connection import Listener
-from oneEuro import OneEuroFilter
 
 class Camera:
 
