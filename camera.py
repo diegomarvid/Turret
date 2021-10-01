@@ -29,7 +29,7 @@ class Camera:
 
         self.initServer()
 
-        self.max_detected_players = 1
+        self.max_detected_players = 2
 
 
     def createEncondedAuthkey(self):
