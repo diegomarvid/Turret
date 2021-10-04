@@ -14,9 +14,15 @@ conn = Client(address, authkey=encoded_authkey)
 turret = Turret()
 personSelector = PersonSelector()
 
+def PrintPersons(detections):
+    for person in detections:
+        print(person, end = " ")
+    print("")
 
 while True:
     msg = conn.recv()
+
+    # PrintPersons(msg)
 
     detectedPerson = personSelector.Select(msg)
 

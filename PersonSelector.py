@@ -28,7 +28,7 @@ class PersonSelector:
                 self.start_time = self.current_time
 
         if len(msg) > 0:
-            return Person(msg[self.current_index])
+            return msg[self.current_index]
 
 
             

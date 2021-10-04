@@ -3,7 +3,7 @@ import numpy as np
 import time
 from pathlib import Path
 from multiprocessing.connection import Listener
-
+from person import Person
 class Camera:
 
     def __init__(self):
@@ -171,7 +171,7 @@ class Camera:
         yr = int(detectedPerson.spatialCoordinates.y)
         zr = int(detectedPerson.spatialCoordinates.z)
 
-        detections.append([xr, yr, zr, detectedPerson.id])
+        detections.append(Person([xr, yr, zr, detectedPerson.id]))
         
     def sendDetectedCoordinates(self, detections):
         self.conn.send(detections)   
@@ -180,8 +180,16 @@ class Camera:
         return detectedPerson.status == dai.Tracklet.TrackingStatus.TRACKED
 
     def oneSecondPassed(self, startTime, currentTime):
-        return (currentTime - startTime) > 0.05
+        return (currentTime - startTime) > 0.3
 
+    def OrderPersonsByClosest(self,detections):
+        detections = sorted(detections)
+        return detections[0:self.max_detected_players]
+
+    def PrintPersons(self,detections):
+        for person in detections:
+            print(person, end = " ")
+        print("")
     
 
     def detect(self):
@@ -210,10 +218,11 @@ class Camera:
                     for detectedPerson in trackletsData:
                         if self.isPersonTracked(detectedPerson):
                             number_of_detected = number_of_detected + 1
-                            if number_of_detected <= self.max_detected_players:
-                                self.addDetectedPerson(detectedPerson, detections)
+                            self.addDetectedPerson(detectedPerson, detections)
 
-                    if number_of_detected > 0: 
+                    if number_of_detected > 0:
+                        detections = self.OrderPersonsByClosest(detections)
+                        # self.PrintPersons(detections)
                         self.sendDetectedCoordinates(detections)
 
     
