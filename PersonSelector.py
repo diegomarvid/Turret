@@ -40,7 +40,7 @@ class PersonSelector:
 
     def GotAHit(self, msg):
         HittedPerson = self.GetPersonInIndex(msg)
-        self.hit_persons[HittedPerson.id] == time.monotonic()
+        self.hit_persons[HittedPerson.id] = time.monotonic()
 
     def ChangeIndexToFirstAvailable(self, msg):
 
@@ -62,6 +62,8 @@ class PersonSelector:
                 foundPerson = True
                 #Hacer algo
 
+    #La persona esta manchada por un maximo de tiempo
+    #Despues de este tiempo pasa como si no la mancho nunca
     def RemovePersonsFromListIfNecessary(self):
 
         for key in list(self.hit_persons.keys()):
