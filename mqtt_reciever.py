@@ -1,9 +1,14 @@
 import json
 from types import SimpleNamespace
 from paho.mqtt import client as mqtt_client
-from multiprocessing.connection import Client
+import sys
+import socketio
 
 class MQTTReciever:
+
+    global sio
+    sio = socketio.Client()
+     
 
     def __init__(self):
         self.broker = 'broker.hivemq.com'
@@ -14,24 +19,10 @@ class MQTTReciever:
         self.client = self.connect_mqtt()
 
         self.subscribe(self.client)
-
-        self.encoded_authkey = self.createEncondedAuthkey()
-        self.port = 5000
-        self.conn = None
-
         self.initClient()
 
-    def createEncondedAuthkey(self):
-        authkey = "secret1"
-        return authkey.encode('UTF-8')
-
     def initClient(self):
-        address_mqtt = ('localhost', 5000)
-
-        authkey_mqtt = "secret1"
-        encoded_authkey_mqtt = authkey_mqtt.encode('UTF-8')
-
-        self.conn = Client(address_mqtt, authkey=encoded_authkey_mqtt)   
+        sio.connect('http://localhost:5000') 
 
     def connect_mqtt(self) -> mqtt_client:
         
@@ -51,7 +42,7 @@ class MQTTReciever:
             self.on_hit()
 
     def on_hit(self):
-        self.conn.send("Targeted player has been changed...")
+        sio.emit("hit","")
 
     def subscribe(self, client: mqtt_client):
         client.subscribe(self.hit_topic)
@@ -59,4 +50,13 @@ class MQTTReciever:
 
     def read(self):
         self.client.loop_forever()
+
+    @sio.event
+    def connect():
+        print('Connected to local socket server!')
+
+    @sio.event
+    def disconnect():
+        print('disconnected from server')
+        sys.exit()
 

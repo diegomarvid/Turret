@@ -2,16 +2,17 @@ import depthai as dai
 import numpy as np
 import time
 from pathlib import Path
-from multiprocessing.connection import Listener
 from person import Person
+import socketio
+import sys
+
 class Camera:
+
+    global sio
+    sio = socketio.Client()
 
     def __init__(self):
        
-        self.encoded_authkey = self.createEncondedAuthkey()
-        self.port = 6000
-        self.conn = None
-
         self.nnPathDefault = self.getNeuralNetworkPath()
         self.fullFrameTracking = False
 
@@ -27,7 +28,7 @@ class Camera:
 
         self.configCamera()
 
-        self.initServer()
+        self.initClient()
 
         self.max_detected_players = 2
 
@@ -151,15 +152,8 @@ class Camera:
         self.linkDevices()
 
 
-    def initServer(self):
-        address = ('localhost', self.port)     # family is deduced to be 'AF_INET'
-
-        listener = Listener(address, authkey= self.encoded_authkey)
-        print(f"Server started at port: {self.port}")
-        print("Waiting for client...")
-
-        self.conn = listener.accept()
-        print('connection accepted from', listener.last_accepted)
+    def initClient(self):
+        sio.connect('http://localhost:5000') 
 
     def getTrackedOutputs(self,device):
         device.getOutputQueue("preview", 4, False)
@@ -174,7 +168,7 @@ class Camera:
         detections.append(Person([xr, yr, zr, detectedPerson.id]))
         
     def sendDetectedCoordinates(self, detections):
-        self.conn.send(detections)   
+        sio.emit("camera", {detections: detections})
     
     def isPersonTracked(self, detectedPerson):
         return detectedPerson.status == dai.Tracklet.TrackingStatus.TRACKED
@@ -224,5 +218,14 @@ class Camera:
                         detections = self.OrderPersonsByClosest(detections)
                         # self.PrintPersons(detections)
                         self.sendDetectedCoordinates(detections)
+
+    @sio.event
+    def connect():
+        print('Connected to local socket server!')
+
+    @sio.event
+    def disconnect():
+        print('disconnected from server')
+        sys.exit()
 
     
