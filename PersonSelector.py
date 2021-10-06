@@ -9,7 +9,8 @@ class PersonSelector:
         self.last_index = 0
         self.start_time = 0
         self.current_time = 0
-        self.hit_persons = []
+        self.hit_persons = dict()
+        self.remove_time = 2
         
     def MaximumTimeHasPassed(self):  
         return self.current_time - self.start_time >= self.time_selected
@@ -35,11 +36,11 @@ class PersonSelector:
             return msg[self.current_index]
 
     def PersonHasNotBeenHitted(self, person):
-        return person not in self.hit_persons
+        return self.hit_persons.get(person.id) == None
 
     def GotAHit(self, msg):
         HittedPerson = self.GetPersonInIndex(msg)
-        self.hit_persons.append(HittedPerson)
+        self.hit_persons[HittedPerson.id] == time.monotonic()
 
     def ChangeIndexToFirstAvailable(self, msg):
 
@@ -61,12 +62,21 @@ class PersonSelector:
                 foundPerson = True
                 #Hacer algo
 
-            
+    def RemovePersonsFromListIfNecessary(self):
 
+        for key in list(self.hit_persons.keys()):
+
+            if self.current_time - self.hit_persons[key] > self.remove_time:
+
+                del self.hit_persons[key]
+
+   
          
     def Select(self, msg):
 
         self.current_time = time.monotonic()
+
+        self.RemovePersonsFromListIfNecessary()
 
         if self.MaximumTimeHasPassed():
 
