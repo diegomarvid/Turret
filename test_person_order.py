@@ -17,17 +17,13 @@ for person in persons_sorted:
 
 d = dict()
 
-# d[p1.id] = time.monotonic()
+d[p1.id] = time.monotonic()
+
 # time.sleep(0.6)
 # d[p2.id] = time.monotonic()
 # time.sleep(0.6)
 # d[p3.id] = time.monotonic()
 
-
-for key in list(d.keys()):
-
-    if time.monotonic() - d[key] > 0.5:
-        del d[key]
 
 for e in d:
     print(e, d[e])

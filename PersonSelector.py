@@ -36,7 +36,7 @@ class PersonSelector:
             return msg[self.current_index]
 
     def PersonHasNotBeenHitted(self, person):
-        return self.hit_persons.get(person.id) == None
+        return person.id not in self.hit_persons
 
     def GotAHit(self, msg):
         HittedPerson = self.GetPersonInIndex(msg)
