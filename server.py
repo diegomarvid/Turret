@@ -4,6 +4,7 @@ from PersonSelector import PersonSelector
 
 import eventlet
 import socketio
+import json
 
 sio = socketio.Server()
 app = socketio.WSGIApp(sio, static_files={
@@ -24,12 +25,23 @@ def ping(sid, data):
 @sio.event
 def hit(sid,data):
     print("Ouch!")
-    # personSelector.GotAHit()
+    personSelector.GotAHit()
 
 @sio.event
 def camera(sid,data):
-    detections = data.detections
+
+    detections_json = data["detections"]
+    detections_obj = json.loads(detections_json)
+
+    detections = []
+
+    for detection in detections_obj:
+        person = Person(**detection)
+        detections.append(person)
+        # print(person)
+
     detectedPerson = personSelector.Select(detections)
+    print(detectedPerson.id)
     # turret.MoveTurretToPerson(detectedPerson)
 
 @sio.event

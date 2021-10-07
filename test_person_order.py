@@ -1,5 +1,6 @@
 from person import Person
 import time
+import json
 
 
 p1 = Person([200,0,3000,0])
@@ -24,6 +25,15 @@ d[p1.id] = time.monotonic()
 # time.sleep(0.6)
 # d[p3.id] = time.monotonic()
 
+jsonstr = json.dumps([person.__dict__ for person in persons])
 
-for e in d:
-    print(e, d[e])
+print(type(jsonstr))
+
+detections = json.loads(jsonstr)
+
+# for detection in detections:
+#     person = Person(**detection)
+#     print(person)
+
+# for e in d:
+#     print(e, d[e])
