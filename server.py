@@ -1,5 +1,5 @@
 from person import Person
-from Turret import Turret
+# from Turret import Turret
 from PersonSelector import PersonSelector
 
 import eventlet
@@ -10,7 +10,7 @@ app = socketio.WSGIApp(sio, static_files={
     '/': {'content_type': 'text/html', 'filename': 'index.html'}
 })
 
-turret = Turret()
+# turret = Turret()
 personSelector = PersonSelector()
 
 @sio.event
@@ -30,7 +30,7 @@ def hit(sid,data):
 def camera(sid,data):
     detections = data.detections
     detectedPerson = personSelector.Select(detections)
-    turret.MoveTurretToPerson(detectedPerson)
+    # turret.MoveTurretToPerson(detectedPerson)
 
 @sio.event
 def disconnect(sid):

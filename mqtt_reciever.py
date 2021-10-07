@@ -1,20 +1,22 @@
-import json
-from types import SimpleNamespace
 from paho.mqtt import client as mqtt_client
 import sys
 import socketio
+import random
 
 class MQTTReciever:
 
     global sio
     sio = socketio.Client()
+
+    global connected
+    connected = False
      
 
     def __init__(self):
         self.broker = 'broker.hivemq.com'
         self.port = 1883
         self.hit_topic = "LaserTag"
-        self.client_id = "turret_raspberry_pi"
+        self.client_id = f'python-mqtt-{random.randint(0, 1000)}'
 
         self.client = self.connect_mqtt()
 
@@ -32,17 +34,27 @@ class MQTTReciever:
             else:
                 print("Failed to connect, return code %d\n", rc)
 
+        def on_disconnect(self, client, userdata, rc):
+            print("Unexpected MQTT disconnection. Will auto-reconnect")
+
         client = mqtt_client.Client(self.client_id)
         client.on_connect = on_connect
+        client.on_disconnect = on_disconnect
         client.connect(self.broker, self.port)
         return client
+
+    def on_disconnect(self, client, userdata, rc):
+        if rc != 0:
+            print("Unexpected MQTT disconnection. Will auto-reconnect")
 
     def on_message(self, client, userdata, msg):
         if msg.topic == self.hit_topic:
             self.on_hit()
 
     def on_hit(self):
-        sio.emit("hit","")
+        print("Sending a hit...")
+        if connected:
+            sio.emit("hit","")
 
     def subscribe(self, client: mqtt_client):
         client.subscribe(self.hit_topic)
@@ -53,10 +65,14 @@ class MQTTReciever:
 
     @sio.event
     def connect():
-        print('Connected to local socket server!')
+        global connected
+        print('Connected to Local Web Server!')
+        connected = True
 
     @sio.event
     def disconnect():
-        print('disconnected from server')
-        sys.exit()
+        global connected
+        print('disconnected from Local Web Server')
+        connected = False
+        # sys.exit()
 
