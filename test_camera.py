@@ -38,8 +38,9 @@ s = sched.scheduler(time.time, time.sleep)
 
 p1 = Person([100,0,2000,0])
 p2 = Person([-50, 100, 5540,1])
+p3 = Person([50, 442, 120,2])
 
-detections = [p1,p2]
+detections = [p1,p2,p3]
 
 jsonstr = json.dumps([person.__dict__ for person in detections])
 

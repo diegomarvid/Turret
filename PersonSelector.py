@@ -1,6 +1,9 @@
 from person import Person
 import time
 
+class AllHitException(Exception):
+    pass
+
 class PersonSelector:
 
     def __init__(self):
@@ -62,6 +65,7 @@ class PersonSelector:
             #Que todos estan manchados
             if begin_index == self.current_index:
                 foundPerson = True
+                raise AllHitException("Todas las personas estas manchadas")
                 #Hacer algo
 
     #La persona esta manchada por un maximo de tiempo
@@ -97,11 +101,15 @@ class PersonSelector:
             return PersonaTrackeada
         else:
             #Cambio el indice al primero que no este manchado
-            self.ChangeIndexToFirstAvailable()
-            # self.ChangeIndex()
-            #Ahora trackeo a esta persona
-            PersonaTrackeada = self.GetPersonInIndex()
-            return PersonaTrackeada
+            try:
+                self.ChangeIndexToFirstAvailable()
+                # self.ChangeIndex()
+                #Ahora trackeo a esta persona
+                PersonaTrackeada = self.GetPersonInIndex()
+                return PersonaTrackeada
+            except AllHitException as e:
+                print(e)
+                return None
 
             
 

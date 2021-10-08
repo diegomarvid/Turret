@@ -41,7 +41,9 @@ def camera(sid,data):
         # print(person)
 
     detectedPerson = personSelector.Select(detections)
-    print(detectedPerson.id)
+
+    if detectedPerson:
+        print(detectedPerson.id)
     # turret.MoveTurretToPerson(detectedPerson)
 
 @sio.event
