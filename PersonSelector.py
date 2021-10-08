@@ -78,7 +78,15 @@ class PersonSelector:
 
                 del self.hit_persons[key]
 
-   
+    def GetFirstPersonNotHit(self):
+        try:
+            self.ChangeIndexToFirstAvailable()
+            #Ahora trackeo a esta persona
+            PersonaTrackeada = self.GetPersonInIndex()
+            return PersonaTrackeada
+        except AllHitException as e:
+            print(e)
+            return None
          
     def Select(self, msg):
 
@@ -95,21 +103,10 @@ class PersonSelector:
         # Aca esta trackeando a la persona en self.current_index
         PersonaTrackeada = self.GetPersonInIndex()
 
-        # return PersonaTrackeada
-
         if self.PersonHasNotBeenHitted(PersonaTrackeada):
             return PersonaTrackeada
         else:
-            #Cambio el indice al primero que no este manchado
-            try:
-                self.ChangeIndexToFirstAvailable()
-                # self.ChangeIndex()
-                #Ahora trackeo a esta persona
-                PersonaTrackeada = self.GetPersonInIndex()
-                return PersonaTrackeada
-            except AllHitException as e:
-                print(e)
-                return None
+            return self.GetFirstPersonNotHit()
 
             
 

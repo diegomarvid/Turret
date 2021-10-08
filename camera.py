@@ -5,6 +5,7 @@ from pathlib import Path
 from person import Person
 import socketio
 import sys
+import json
 
 class Camera:
 
@@ -168,7 +169,8 @@ class Camera:
         detections.append(Person([xr, yr, zr, detectedPerson.id]))
         
     def sendDetectedCoordinates(self, detections):
-        sio.emit("camera", {detections: detections})
+        jsonstr = json.dumps([person.__dict__ for person in detections])
+        sio.emit("camera", {detections: jsonstr})
     
     def isPersonTracked(self, detectedPerson):
         return detectedPerson.status == dai.Tracklet.TrackingStatus.TRACKED
