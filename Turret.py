@@ -15,10 +15,7 @@ class Turret:
         self.serial_connection = Connection(port="/dev/ttyS0", baudrate=1000000)
 
     def MoveTurretToPerson(self, person):
-
-        if person == None:
-            return
-        
+    
         theta = self.GetThetaAngle(person.x, person.z)
         rho = self.GetRhoAngle(person.y, person.z)
 

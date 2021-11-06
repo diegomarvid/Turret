@@ -6,7 +6,7 @@ from person import Person
 import socketio
 import sys
 import json
-
+from filterpy.common.kinematic import kinematic_kf
 class Camera:
 
     global sio
@@ -32,6 +32,13 @@ class Camera:
         self.initClient()
 
         self.max_detected_players = 2
+
+        self.kf = kinematic_kf(dim=1, order=1, dt=0.2)
+
+        self.kf.R[0,0] = 1
+
+        self.filtrados = []
+        self.filtrados.append(0)
 
 
     def createEncondedAuthkey(self):
@@ -160,13 +167,46 @@ class Camera:
         device.getOutputQueue("preview", 4, False)
         return device.getOutputQueue("tracklets", 4, False)
 
+    def IsInPredictThreshold(self,difference):
+
+        min_threshold = 5
+
+        max_threshold = 500
+
+        difference = np.absolute(difference)
+
+        return  difference >= min_threshold and difference <= max_threshold
+
+    def PredictValue(self,q1, q2):
+
+        difference = q2 - q1
+
+        if  self.IsInPredictThreshold(difference):
+            return q2 + 0 * difference 
+        else:
+            return q2
+
     def addDetectedPerson(self,detectedPerson, detections):
 
         xr = int(detectedPerson.spatialCoordinates.x)
         yr = int(detectedPerson.spatialCoordinates.y)
         zr = int(detectedPerson.spatialCoordinates.z)
 
-        detections.append(Person([xr, yr, zr, detectedPerson.id]))
+        yr = yr + 200
+
+        self.kf.predict()
+        self.kf.update(xr)
+
+        xr = self.kf.x[0]
+        xr = xr[0]
+
+        self.filtrados.append(xr)
+
+        nueva_posicion = self.PredictValue(self.filtrados[0], self.filtrados[1])
+
+        del self.filtrados[0]
+    
+        detections.append(Person([nueva_posicion, yr, zr, detectedPerson.id]))
         
     def sendDetectedCoordinates(self, detections):
         jsonstr = json.dumps([person.__dict__ for person in detections])
@@ -176,7 +216,7 @@ class Camera:
         return detectedPerson.status == dai.Tracklet.TrackingStatus.TRACKED
 
     def oneSecondPassed(self, startTime, currentTime):
-        return (currentTime - startTime) > 0.3
+        return (currentTime - startTime) > 0.2
 
     def OrderPersonsByClosest(self,detections):
         detections = sorted(detections)

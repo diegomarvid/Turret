@@ -7,6 +7,7 @@ import socketio
 import json
 
 sio = socketio.Server()
+
 app = socketio.WSGIApp(sio, static_files={
     '/': {'content_type': 'text/html', 'filename': 'index.html'}
 })
@@ -43,7 +44,7 @@ def camera(sid,data):
     detectedPerson = personSelector.Select(detections)
 
     if detectedPerson:
-        print(detectedPerson.id)
+        #print(detectedPerson.id)
         turret.MoveTurretToPerson(detectedPerson)
 
 @sio.event
@@ -51,4 +52,4 @@ def disconnect(sid):
     print('disconnect ', sid)
 
 if __name__ == '__main__':
-    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)
+    eventlet.wsgi.server(eventlet.listen(('', 5000)), app, log=None, log_output=False)
