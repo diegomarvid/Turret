@@ -34,7 +34,7 @@ def disconnect():
 sio.connect('http://localhost:5000')
 
 
-s = sched.scheduler(time.time, time.sleep)
+# s = sched.scheduler(time.time, time.sleep)
 
 p1 = Person([100,0,2000,0])
 p2 = Person([-50, 100, 5540,1])
@@ -47,13 +47,14 @@ jsonstr = json.dumps([person.__dict__ for person in detections])
 def send_detections(sc): 
     print("Sending detections...")
     sio.emit("camera", {'detections': jsonstr})
+    # sio.emit("camera", )
     # do your stuff
-    s.enter(1, 1, send_detections, (sc,))
+    # s.enter(1, 1, send_detections, (sc,))
 
-s.enter(1, 1, send_detections, (s,))
-s.run()
+# s.enter(1, 1, send_detections, (s,))
+# s.run()
 
-start_time = time.monotonic()
+# start_time = time.monotonic()
 
 # sio.emit("ping", "")
 

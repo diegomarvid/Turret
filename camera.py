@@ -170,7 +170,7 @@ class Camera:
         
     def sendDetectedCoordinates(self, detections):
         jsonstr = json.dumps([person.__dict__ for person in detections])
-        sio.emit("camera", {detections: jsonstr})
+        sio.emit("camera", {'detections': jsonstr})
     
     def isPersonTracked(self, detectedPerson):
         return detectedPerson.status == dai.Tracklet.TrackingStatus.TRACKED
