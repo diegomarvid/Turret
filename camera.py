@@ -7,6 +7,8 @@ import socketio
 import sys
 import json
 from filterpy.common.kinematic import kinematic_kf
+import cv2
+
 class Camera:
 
     global sio
