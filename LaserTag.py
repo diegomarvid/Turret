@@ -6,7 +6,7 @@ class State(Enum):
    GREEN = 1
    RED = 0
 
-interrupt_time_in_s = 0.2
+interrupt_time_in_s =0.03
 
 
 GREEN_TIME_IN_S = 3
@@ -28,7 +28,7 @@ def Shoot():
     #Set GPIO 1
     GPIO.output(SHOOT_GPIO, 1)
     time.sleep(0.01)
-    print("shoot")
+    #print("shoot")
     GPIO.output(SHOOT_GPIO, 0)
     #Set GPIO 0
    
