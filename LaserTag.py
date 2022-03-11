@@ -6,7 +6,7 @@ class State(Enum):
    GREEN = 1
    RED = 0
 
-interrupt_time_in_s = 1
+interrupt_time_in_s = 0.2
 
 
 GREEN_TIME_IN_S = 3
