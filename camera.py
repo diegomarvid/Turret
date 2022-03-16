@@ -8,6 +8,7 @@ import sys
 import json
 from filterpy.common.kinematic import kinematic_kf
 import cv2
+import csv
 
 class Camera:
 
@@ -35,7 +36,7 @@ class Camera:
 
         self.max_detected_players = 2
 
-        self.kf = kinematic_kf(dim=1, order=1, dt=0.2)
+        self.kf = kinematic_kf(dim=1, order=1, dt=0.05)
 
         self.kf.R[0,0] = 1
 
@@ -184,9 +185,20 @@ class Camera:
         difference = q2 - q1
 
         if  self.IsInPredictThreshold(difference):
-            return q2 + 0 * difference 
+            return q2 + 2 * difference 
         else:
             return q2
+
+    def SavePersonCSV(self, writer, time, detectedPerson):
+
+
+        xr = int(detectedPerson.spatialCoordinates.x)
+        yr = int(detectedPerson.spatialCoordinates.y)
+        zr = int(detectedPerson.spatialCoordinates.z)
+
+        yr = yr + 200
+        
+        writer.writerow([time, xr, yr, zr, detectedPerson.id])
 
     def addDetectedPerson(self,detectedPerson, detections):
 
@@ -217,8 +229,8 @@ class Camera:
     def isPersonTracked(self, detectedPerson):
         return detectedPerson.status == dai.Tracklet.TrackingStatus.TRACKED
 
-    def oneSecondPassed(self, startTime, currentTime):
-        return (currentTime - startTime) > 0.2
+    def timePassed(self, startTime, currentTime):
+        return (currentTime - startTime) > 0.05
 
     def OrderPersonsByClosest(self,detections):
         detections = sorted(detections)
@@ -287,13 +299,16 @@ class Camera:
                     break
 
 
+	
+
     def detect(self):
         # Pipeline defined, now the device is connected to
         with dai.Device(self.pipeline) as device:
-
+		
             tracklets = self.getTrackedOutputs(device)
 
             startTime = time.monotonic()
+            
 
             while(True):
 
@@ -301,10 +316,10 @@ class Camera:
 
                 number_of_detected = 0
 
-                if self.oneSecondPassed(startTime, currentTime):
+                if self.timePassed(startTime, currentTime):
 
                     startTime = currentTime
-              
+                
                     track = tracklets.get()
                     trackletsData = track.tracklets
 
